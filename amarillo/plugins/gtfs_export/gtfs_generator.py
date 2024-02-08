@@ -1,14 +1,16 @@
+from fastapi import FastAPI
+
 from amarillo.models.Carpool import Region
 from amarillo.plugins.gtfs_export.gtfs_export import GtfsExport, GtfsFeedInfo, GtfsAgency
 from amarillo.plugins.gtfs_export.gtfs import GtfsRtProducer
 from amarillo.utils.container import container
+from amarillo.plugins.gtfs_export.router import router
 from glob import glob
 import json
 import schedule
 import threading
 import time
 import logging
-from datetime import date, timedelta
 
 logger = logging.getLogger(__name__)
 
@@ -69,3 +71,7 @@ def start_schedule():
 	schedule.run_all()
 	job_thread = threading.Thread(target=run_schedule, daemon=True)
 	job_thread.start()
+
+def setup(app : FastAPI):
+	app.include_router(router)
+	start_schedule()

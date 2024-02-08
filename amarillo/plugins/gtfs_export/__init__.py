@@ -1,0 +1,1 @@
+from .gtfs_generator import setup
