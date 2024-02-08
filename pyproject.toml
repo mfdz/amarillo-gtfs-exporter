@@ -1,0 +1,11 @@
+[project]
+name = "amarillo-gtfs-export"
+version = "0.0.1"
+dependencies = [
+    "amarillo",
+    "amarillo-enhancer",
+    "schedule==1.2.1",
+]
+
+[tool.setuptools.packages]
+find = {}
