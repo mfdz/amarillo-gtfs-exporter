@@ -161,3 +161,9 @@ cython_debug/
 #.idea/
 
 data/
+secrets
+logging.conf
+config
+static/**
+templates/**
+conf/**
