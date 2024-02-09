@@ -10,10 +10,13 @@ from fastapi.responses import FileResponse
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(
-    prefix="/region",
-    tags=["region"]
-)
+router = APIRouter()
+
+@router.post("/export")
+async def post_agency_conf(admin_api_key: str = Depends(verify_admin_api_key)):
+    #import is here to avoid circular import
+    from amarillo.plugins.gtfs_export.gtfs_generator import generate_gtfs
+    generate_gtfs()
 
 #TODO: move to amarillo/utils?
 def _assert_region_exists(region_id: str) -> Region:
@@ -29,7 +32,7 @@ def _assert_region_exists(region_id: str) -> Region:
     return region
 
 
-@router.get("/{region_id}/gtfs", 
+@router.get("region/{region_id}/gtfs", 
     summary="Return GTFS Feed for this region",
     response_description="GTFS-Feed (zip-file)",
     response_class=FileResponse,
@@ -41,7 +44,7 @@ async def get_file(region_id: str, user: str = Depends(verify_admin_api_key)):
     _assert_region_exists(region_id)
     return FileResponse(f'data/gtfs/amarillo.{region_id}.gtfs.zip')
 
-@router.get("/{region_id}/gtfs-rt",
+@router.get("region/{region_id}/gtfs-rt",
     summary="Return GTFS-RT Feed for this region",
     response_description="GTFS-RT-Feed",
     response_class=FileResponse,
