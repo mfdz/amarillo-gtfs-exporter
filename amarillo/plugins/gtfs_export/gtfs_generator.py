@@ -5,6 +5,7 @@ from amarillo.plugins.gtfs_export.gtfs_export import GtfsExport, GtfsFeedInfo, G
 from amarillo.plugins.gtfs_export.gtfs import GtfsRtProducer
 from amarillo.utils.container import container
 from amarillo.plugins.gtfs_export.router import router
+from amarillo.plugins.enhancer.configuration import configure_enhancer_services
 from glob import glob
 import json
 import schedule
@@ -73,5 +74,6 @@ def start_schedule():
 	job_thread.start()
 
 def setup(app : FastAPI):
+	configure_enhancer_services()
 	app.include_router(router)
 	start_schedule()
