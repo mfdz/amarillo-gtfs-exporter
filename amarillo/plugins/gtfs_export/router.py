@@ -32,7 +32,7 @@ def _assert_region_exists(region_id: str) -> Region:
     return region
 
 
-@router.get("region/{region_id}/gtfs", 
+@router.get("/region/{region_id}/gtfs", 
     summary="Return GTFS Feed for this region",
     response_description="GTFS-Feed (zip-file)",
     response_class=FileResponse,
@@ -44,7 +44,7 @@ async def get_file(region_id: str, user: str = Depends(verify_admin_api_key)):
     _assert_region_exists(region_id)
     return FileResponse(f'data/gtfs/amarillo.{region_id}.gtfs.zip')
 
-@router.get("region/{region_id}/gtfs-rt",
+@router.get("/region/{region_id}/gtfs-rt",
     summary="Return GTFS-RT Feed for this region",
     response_description="GTFS-RT-Feed",
     response_class=FileResponse,
