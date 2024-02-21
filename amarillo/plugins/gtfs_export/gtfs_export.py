@@ -112,7 +112,7 @@ class GtfsExport:
             return destination
    
     def _create_route(self, trip): 
-        return GtfsRoute(trip.agency, trip.trip_id, trip.route_long_name(), RIDESHARING_ROUTE_TYPE, trip.url, "")
+        return GtfsRoute(trip.agency, trip.trip_id, trip.route_long_name(), RIDESHARING_ROUTE_TYPE, trip.url, "", trip.route_color, trip.route_text_color)
         
     def _create_calendar(self, trip):
         # TODO currently, calendar is not provided by Fahrgemeinschaft.de interface.

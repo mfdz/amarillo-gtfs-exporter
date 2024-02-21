@@ -4,7 +4,7 @@ from datetime import timedelta
 
 GtfsFeedInfo = namedtuple('GtfsFeedInfo', 'feed_id feed_publisher_name feed_publisher_url feed_lang feed_version')
 GtfsAgency = namedtuple('GtfsAgency', 'agency_id agency_name agency_url agency_timezone agency_lang agency_email')
-GtfsRoute = namedtuple('GtfsRoute',  'agency_id route_id route_long_name route_type route_url route_short_name')
+GtfsRoute = namedtuple('GtfsRoute',  'agency_id route_id route_long_name route_type route_url route_short_name route_color route_text_color')
 GtfsStop = namedtuple('GtfsStop', 'stop_id stop_lat stop_lon stop_name')
 GtfsStopTime = namedtuple('GtfsStopTime', 'trip_id departure_time arrival_time stop_id stop_sequence pickup_type drop_off_type timepoint')
 GtfsTrip = namedtuple('GtfsTrip', 'route_id trip_id service_id shape_id trip_headsign bikes_allowed')
