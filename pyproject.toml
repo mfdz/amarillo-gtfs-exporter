@@ -1,5 +1,5 @@
 [project]
-name = "amarillo-gtfs-export"
+name = "amarillo-gtfs-exporter"
 version = "0.0.1"
 dependencies = [
     "amarillo",
