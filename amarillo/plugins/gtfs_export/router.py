@@ -1,6 +1,8 @@
 import logging
-
-from fastapi import APIRouter, HTTPException, status, Depends
+import requests
+import os
+from datetime import datetime, date, timedelta
+from fastapi import APIRouter, HTTPException, Response, status, Depends
 
 from amarillo.models.Carpool import Region
 from amarillo.services.regions import RegionService
@@ -8,17 +10,11 @@ from amarillo.services.oauth2 import get_current_user, verify_permission
 from amarillo.models.User import User
 from amarillo.utils.container import container
 from fastapi.responses import FileResponse
+from .config import config
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
-
-@router.post("/export")
-async def trigger_export(requesting_user: User = Depends(get_current_user)):
-    verify_permission("admin", requesting_user)
-    #import is here to avoid circular import
-    from amarillo.plugins.gtfs_export.gtfs_generator import generate_gtfs
-    generate_gtfs()
 
 #TODO: move to amarillo/utils?
 def _assert_region_exists(region_id: str) -> Region:
@@ -33,6 +29,11 @@ def _assert_region_exists(region_id: str) -> Region:
 
     return region
 
+def is_cached(path : str):
+    if not os.path.isfile(path): return False
+
+    timestamp = os.path.getmtime(path)
+    return datetime.fromtimestamp(timestamp).date() == date.today()
 
 @router.get("/region/{region_id}/gtfs", 
     summary="Return GTFS Feed for this region",
@@ -43,8 +44,20 @@ def _assert_region_exists(region_id: str) -> Region:
         }
     )
 async def get_file(region_id: str, requesting_user: User = Depends(get_current_user)):
+    verify_permission("gtfs", requesting_user)
     _assert_region_exists(region_id)
-    return FileResponse(f'data/gtfs/amarillo.{region_id}.gtfs.zip')
+    file_path = f'data/gtfs/amarillo.{region_id}.gtfs.zip'
+    if is_cached(file_path):
+        logger.info("Returning cached response")
+        return FileResponse(file_path)
+    
+    logger.info("Returning new response")
+    response = requests.get(f"{config.generator_url}/region/{region_id}/gtfs/")
+    # cache response
+    with open(file_path, "wb") as file:
+        file.write(response.content)
+
+    return  Response(content=response.content, media_type="application/zip")
 
 @router.get("/region/{region_id}/gtfs-rt",
     summary="Return GTFS-RT Feed for this region",
@@ -56,11 +69,24 @@ async def get_file(region_id: str, requesting_user: User = Depends(get_current_u
         }
     )
 async def get_file(region_id: str, format: str = 'protobuf', requesting_user: User = Depends(get_current_user)):
+    verify_permission("gtfs", requesting_user)
     _assert_region_exists(region_id)
     if format == 'json':
-        return FileResponse(f'data/gtfs/amarillo.{region_id}.gtfsrt.json')
+        file_path = f'data/gtfs/amarillo.{region_id}.gtfsrt.json'
     elif format == 'protobuf':
-        return FileResponse(f'data/gtfs/amarillo.{region_id}.gtfsrt.pbf')
+        file_path = f'data/gtfs/amarillo.{region_id}.gtfsrt.pbf'
     else:
         message = "Specified format is not supported, i.e. neither protobuf nor json."
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=message)
+    
+    if is_cached(file_path):
+        logger.info("Returning cached response")
+        return FileResponse(file_path)
+    
+    logger.info("Returning new response")
+    response = requests.get(f"{config.generator_url}/region/{region_id}/gtfs-rt/?format={format}")
+    # cache response
+    with open(file_path, "wb") as file:
+        file.write(response.content)
+
+    return  Response(content=response.content)
