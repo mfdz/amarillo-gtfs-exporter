@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent { label 'builtin' }
     environment {
         GITEA_CREDS = credentials('AMARILLO-JENKINS-GITEA-USER')
         PYPI_CREDS = credentials('AMARILLO-JENKINS-PYPI-USER')
@@ -9,7 +9,7 @@ pipeline {
         stage('Create virtual environment') {
             steps {
                 echo 'Creating virtual environment'
-                sh '''python -m venv .venv
+                sh '''python3 -m venv .venv
                 . .venv/bin/activate'''
             }
         }
