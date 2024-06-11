@@ -9,7 +9,7 @@ pipeline {
         stage('Create virtual environment') {
             steps {
                 echo 'Creating virtual environment'
-                sh '''python3 -m venv .venv
+                sh '''python -m venv .venv
                 . .venv/bin/activate'''
             }
         }
