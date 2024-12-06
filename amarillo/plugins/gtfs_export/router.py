@@ -14,7 +14,10 @@ from .config import config
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/region",
+    tags=["region"]
+)
 
 @router.post("/export")
 async def trigger_export(admin_api_key: str = Depends(verify_admin_api_key)):
