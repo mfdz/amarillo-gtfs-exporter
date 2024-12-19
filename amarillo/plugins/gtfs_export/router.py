@@ -15,7 +15,6 @@ from .config import config
 logger = logging.getLogger(__name__)
 
 router = APIRouter(
-    prefix="/region",
     tags=["region"]
 )
 
