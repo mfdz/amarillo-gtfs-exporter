@@ -3,8 +3,7 @@ import requests
 import os
 import glob
 from datetime import datetime, date, timedelta
-from fastapi import APIRouter, HTTPException, Response, status, Depends
-
+from fastapi import FastAPI, APIRouter, HTTPException, Response, status, Depends
 from amarillo.models.Carpool import Region
 from amarillo.routers.agencyconf import verify_admin_api_key, verify_api_key 
 from amarillo.services.regions import RegionService
@@ -48,7 +47,7 @@ def _assert_region_exists(region_id: str) -> Region:
 
     return region
 
-# File on disk is from the today
+# File on disk is from today
 def is_cached_day(path : str):
     if not os.path.isfile(path): return False
 
@@ -117,3 +116,6 @@ async def get_file(region_id: str, format: str = 'protobuf', user: str = Depends
             file.write(response.content)
 
     return  Response(content=response.content)
+
+def setup(app : FastAPI):
+	app.include_router(router)
